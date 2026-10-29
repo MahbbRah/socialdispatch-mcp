@@ -405,6 +405,11 @@ const TOOLS: Tool[] = [
           description:
             'Alias for thumbnailFile/thumbnailUrl: custom thumbnail image path or URL for TikTok video uploads',
         },
+        isAlteredContent: {
+          type: 'boolean',
+          description:
+            'Whether the content contains AI-generated or altered media. Defaults to true for compliance with YouTube (containsSyntheticMedia), Facebook & Instagram (is_ai_generated), and TikTok (is_aigc).',
+        },
       },
       required: ['accountIds'],
     },
@@ -499,6 +504,11 @@ const TOOLS: Tool[] = [
           type: 'string',
           description:
             'Alias for thumbnailFile/thumbnailUrl: custom thumbnail image path or URL for TikTok video uploads',
+        },
+        isAlteredContent: {
+          type: 'boolean',
+          description:
+            'Whether the content contains AI-generated or altered media. Defaults to true for compliance with YouTube (containsSyntheticMedia), Facebook & Instagram (is_ai_generated), and TikTok (is_aigc).',
         },
       },
       required: ['accountIds'],
@@ -917,6 +927,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         const platformOptions = {
+          isAlteredContent: args?.isAlteredContent ?? true,
           ...((args?.platformOptions as Record<string, any>) || {}),
           ...(args?.title ? { title: String(args.title) } : {}),
           ...(Array.isArray(args?.tags) ? { tags: args.tags } : {}),
@@ -979,6 +990,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         const platformOptions = {
+          isAlteredContent: args?.isAlteredContent ?? true,
           ...((args?.platformOptions as Record<string, any>) || {}),
           ...(args?.title ? { title: String(args.title) } : {}),
           ...(Array.isArray(args?.tags) ? { tags: args.tags } : {}),
@@ -1105,6 +1117,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const resolvedThumb = await resolveThumbnailUrl(thumbCandidate);
 
         const platformOptions = {
+          isAlteredContent: args?.isAlteredContent ?? true,
           ...((args?.platformOptions as Record<string, any>) || {}),
           ...(args?.title ? { title: String(args.title) } : {}),
           ...(Array.isArray(args?.tags) ? { tags: args.tags } : {}),

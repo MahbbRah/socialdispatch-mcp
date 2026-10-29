@@ -346,6 +346,10 @@ const TOOLS = [
                     type: 'string',
                     description: 'Alias for thumbnailFile/thumbnailUrl: custom thumbnail image path or URL for TikTok video uploads',
                 },
+                isAlteredContent: {
+                    type: 'boolean',
+                    description: 'Whether the content contains AI-generated or altered media. Defaults to true for compliance with YouTube (containsSyntheticMedia), Facebook & Instagram (is_ai_generated), and TikTok (is_aigc).',
+                },
             },
             required: ['accountIds'],
         },
@@ -428,6 +432,10 @@ const TOOLS = [
                 tiktokThumbnail: {
                     type: 'string',
                     description: 'Alias for thumbnailFile/thumbnailUrl: custom thumbnail image path or URL for TikTok video uploads',
+                },
+                isAlteredContent: {
+                    type: 'boolean',
+                    description: 'Whether the content contains AI-generated or altered media. Defaults to true for compliance with YouTube (containsSyntheticMedia), Facebook & Instagram (is_ai_generated), and TikTok (is_aigc).',
                 },
             },
             required: ['accountIds'],
@@ -802,6 +810,7 @@ server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
                     uploaded.push(resolvedThumb.uploaded);
                 }
                 const platformOptions = {
+                    isAlteredContent: args?.isAlteredContent ?? true,
                     ...(args?.platformOptions || {}),
                     ...(args?.title ? { title: String(args.title) } : {}),
                     ...(Array.isArray(args?.tags) ? { tags: args.tags } : {}),
@@ -854,6 +863,7 @@ server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
                     uploaded.push(resolvedThumb.uploaded);
                 }
                 const platformOptions = {
+                    isAlteredContent: args?.isAlteredContent ?? true,
                     ...(args?.platformOptions || {}),
                     ...(args?.title ? { title: String(args.title) } : {}),
                     ...(Array.isArray(args?.tags) ? { tags: args.tags } : {}),
@@ -962,6 +972,7 @@ server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
                 const thumbCandidate = (args?.thumbnailFile || args?.thumbnailUrl || args?.youtubeThumbnail || args?.facebookThumbnail || args?.tiktokThumbnail);
                 const resolvedThumb = await resolveThumbnailUrl(thumbCandidate);
                 const platformOptions = {
+                    isAlteredContent: args?.isAlteredContent ?? true,
                     ...(args?.platformOptions || {}),
                     ...(args?.title ? { title: String(args.title) } : {}),
                     ...(Array.isArray(args?.tags) ? { tags: args.tags } : {}),

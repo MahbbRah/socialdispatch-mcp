@@ -49,7 +49,8 @@ Call `publish_social_post`:
   "thumbnailFile": "/absolute/path/to/thumbnail.jpg",
   "tags": ["AI agents", "agentic workflows", "LLMs"],
   "privacyStatus": "public",
-  "isShort": false
+  "isShort": false,
+  "isAlteredContent": true
 }
 ```
 
@@ -65,9 +66,14 @@ Call `schedule_social_post` with an ISO-8601 UTC timestamp (`scheduledAt`):
   "tags": ["AI agents", "agentic workflows", "LLMs"],
   "privacyStatus": "public",
   "isShort": false,
+  "isAlteredContent": true,
   "scheduledAt": "2026-11-01T15:00:00.000Z"
 }
 ```
+
+### AI-Generated Content Compliance (`isAlteredContent`)
+* `"isAlteredContent"` defaults to **`true`** for automated compliance across YouTube (`containsSyntheticMedia: true`), Facebook & Instagram (`is_ai_generated: true`), and TikTok (`is_aigc: true`).
+* Explicitly pass `"isAlteredContent": false` only when the post contains purely authentic, unaltered human recordings.
 
 ### YouTube Shorts vs Regular Videos (`isShort`)
 * Set `"isShort": true` to force YouTube Shorts handling (appends `#Shorts` and returns the `youtube.com/shorts/...` URL format).
