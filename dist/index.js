@@ -1,22 +1,17 @@
 #!/usr/bin/env node
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
-const stdio_js_1 = require("@modelcontextprotocol/sdk/server/stdio.js");
-const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
-const axios_1 = __importDefault(require("axios"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
-const os_1 = __importDefault(require("os"));
-const form_data_1 = __importDefault(require("form-data"));
-dotenv_1.default.config();
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema, } from '@modelcontextprotocol/sdk/types.js';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import FormData from 'form-data';
+dotenv.config();
 const API_BASE_URL = (process.env.SOCIALDISPATCH_API_URL || 'https://api.socialdispatch.site').replace(/\/+$/, '');
 const API_KEY = process.env.SOCIALDISPATCH_API_KEY || '';
-const apiClient = axios_1.default.create({
+const apiClient = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
@@ -32,7 +27,7 @@ const apiClient = axios_1.default.create({
     maxContentLength: Infinity,
 });
 function getMimeType(filePath) {
-    const ext = path_1.default.extname(filePath).toLowerCase();
+    const ext = path.extname(filePath).toLowerCase();
     switch (ext) {
         case '.png':
             return 'image/png';
@@ -56,9 +51,9 @@ function getMimeType(filePath) {
 }
 function resolveLocalPath(filePath) {
     if (filePath.startsWith('~')) {
-        return path_1.default.join(os_1.default.homedir(), filePath.slice(1));
+        return path.join(os.homedir(), filePath.slice(1));
     }
-    return path_1.default.resolve(filePath);
+    return path.resolve(filePath);
 }
 function isLocalFilePath(input) {
     if (!input || typeof input !== 'string')
@@ -66,18 +61,18 @@ function isLocalFilePath(input) {
     if (input.startsWith('http://') || input.startsWith('https://'))
         return false;
     const resolved = resolveLocalPath(input);
-    return fs_1.default.existsSync(resolved);
+    return fs.existsSync(resolved);
 }
 async function uploadMediaFile(inputPath, preferredFileName) {
     const resolvedPath = resolveLocalPath(inputPath);
-    if (!fs_1.default.existsSync(resolvedPath)) {
+    if (!fs.existsSync(resolvedPath)) {
         throw new Error(`Local file not found at path: ${inputPath} (resolved: ${resolvedPath})`);
     }
-    const stat = fs_1.default.statSync(resolvedPath);
+    const stat = fs.statSync(resolvedPath);
     if (!stat.isFile()) {
         throw new Error(`Path is not a regular file: ${resolvedPath}`);
     }
-    const fileName = preferredFileName || path_1.default.basename(resolvedPath);
+    const fileName = preferredFileName || path.basename(resolvedPath);
     const mimeType = getMimeType(resolvedPath);
     const size = stat.size;
     // 1. Try requesting a pre-signed PUT upload URL from SocialDispatch API
@@ -87,8 +82,8 @@ async function uploadMediaFile(inputPath, preferredFileName) {
         const data = presignRes.data;
         if (data?.success && data?.storageProvider === 'R2' && data?.uploadUrl) {
             // Direct PUT to Cloudflare R2
-            const readStream = fs_1.default.createReadStream(resolvedPath);
-            await axios_1.default.put(data.uploadUrl, readStream, {
+            const readStream = fs.createReadStream(resolvedPath);
+            await axios.put(data.uploadUrl, readStream, {
                 headers: {
                     'Content-Type': mimeType,
                     'Content-Length': size,
@@ -113,8 +108,8 @@ async function uploadMediaFile(inputPath, preferredFileName) {
         console.error(`[SocialDispatch MCP] Presigned URL failed, falling back to direct upload: ${err.message}`);
     }
     // 2. Direct multipart stream upload to /api/media/upload
-    const form = new form_data_1.default();
-    form.append('file', fs_1.default.createReadStream(resolvedPath), {
+    const form = new FormData();
+    form.append('file', fs.createReadStream(resolvedPath), {
         filename: fileName,
         contentType: mimeType,
         knownLength: size,
@@ -210,7 +205,7 @@ function extractAutoThumbnail(resolvedMediaUrls, explicitThumb) {
     }
     return { thumb: undefined, filteredMediaUrls: resolvedMediaUrls };
 }
-const server = new index_js_1.Server({
+const server = new Server({
     name: 'socialdispatch-mcp',
     version: '1.0.0',
 }, {
@@ -726,13 +721,13 @@ const TOOLS = [
     },
 ];
 // Handle ListTools
-server.setRequestHandler(types_js_1.ListToolsRequestSchema, async () => {
+server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
         tools: TOOLS,
     };
 });
 // Handle CallTool
-server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
     try {
         switch (name) {
@@ -1161,7 +1156,7 @@ server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
     }
 });
 async function run() {
-    const transport = new stdio_js_1.StdioServerTransport();
+    const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error('[SocialDispatch MCP] Server connected via stdio transport.');
 }

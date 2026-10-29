@@ -2,6 +2,9 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('MCP Server Pipeline & Disclosure Tools Verification', () => {
   test('MCP server index should define pipeline and disclosure features', () => {

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Official Model Context Protocol (MCP) server for SocialDispatch — Automate social media publishing with AI agents",
   "main": "dist/index.js",
+  "type": "module",
   "bin": {
     "socialdispatch-mcp": "./bin/socialdispatch-mcp.js"
   },
