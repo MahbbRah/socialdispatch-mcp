@@ -88,6 +88,30 @@ Add to `.cursor/mcp.json` or your MCP Settings pane:
 
 ---
 
+## 🧠 Agent Skill: One-Shot Publishing (`/socialdispatch-publish`)
+
+This repository includes a pre-built agent skill at [`skills/socialdispatch-publish/SKILL.md`](skills/socialdispatch-publish/SKILL.md).
+
+It provides AI assistants with step-by-step procedures to post or schedule to Facebook, YouTube, Instagram, and X without code inspection or token burn. It handles:
+- **YouTube uploads**: Titles, video descriptions, tags, and custom video thumbnail pairing.
+- **YouTube Shorts auto-detection**: Correct aspect ratio & duration handling (`#Shorts`).
+- **Multi-channel dispatch**: Posting across Facebook Pages, Instagram, and X in a single command.
+
+### How to Install the Skill:
+
+#### For Google Antigravity / Gemini CLI:
+Copy the skill into your Gemini skills directory:
+```bash
+mkdir -p ~/.gemini/skills/socialdispatch-publish
+cp skills/socialdispatch-publish/SKILL.md ~/.gemini/skills/socialdispatch-publish/
+```
+Once installed, your agent automatically activates the skill whenever you ask to publish, or you can trigger it via the `/socialdispatch-publish` slash command.
+
+#### For Cursor / Windsurf / Claude:
+Copy the content of [`skills/socialdispatch-publish/SKILL.md`](skills/socialdispatch-publish/SKILL.md) into your `.cursorrules`, project rules, or Claude Project Custom Instructions.
+
+---
+
 ## 🧰 Available Tools (14 Tools)
 
 ### 🚀 Publishing & Scheduling
